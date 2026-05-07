@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GrowSeason 2026</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="data.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="app.js"></script>
+</head>
+<body x-data="app" x-init="init()">
+
+<!-- ── Header ───────────────────────────────────── -->
+<header class="app-header">
+  <h1>GrowSeason 2026</h1>
+  <div class="header-actions">
+    <span style="font-size:.75rem;color:var(--muted)" x-text="today.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})"></span>
+    <button class="btn-icon" title="Settings" @click="showSettings=true; editTransplant=settings.transplantDate; editFrost=settings.firstFrostDate">&#9881;</button>
+  </div>
+</header>
+
+<!-- ── Tab nav ──────────────────────────────────── -->
+<nav class="tab-nav" role="tablist">
+  <button class="tab-btn" :class="{active:activeTab==='timeline'}" @click="switchTab('timeline')" role="tab">Timeline</button>
+  <button class="tab-btn" :class="{active:activeTab==='now'}"      @click="switchTab('now')"      role="tab">Now</button>
+  <button class="tab-btn" :class="{active:activeTab==='tasks'}"    @click="switchTab('tasks')"    role="tab">Tasks</button>
+  <button class="tab-btn" :class="{active:activeTab==='journal'}"  @click="switchTab('journal')"  role="tab">Journal</button>
+  <button class="tab-btn" :class="{active:activeTab==='shopping'}" @click="switchTab('shopping')" role="tab">Shopping</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- Panel: Timeline                                  -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="panel-timeline" class="tab-panel" :class="{active:activeTab==='timeline'}">
+  <div class="card-title" style="margin-bottom:.5rem">Season at a glance &mdash; Roanoke, VA 2026</div>
+
+  <!-- Desktop SVG timeline -->
+  <div id="timeline-wrap">
+    <svg id="timeline-svg" aria-label="Season timeline"></svg>
+  </div>
+
+  <!-- Mobile vertical timeline -->
+  <div class="vtimeline card" style="padding:.75rem">
+    <div class="card-title">Season timeline</div>
+    <div id="vtimeline-wrap"></div>
+    <div style="margin-top:.75rem;font-size:.7rem;color:var(--muted);display:flex;gap:1rem;flex-wrap:wrap">
+      <span><span style="display:inline-block;width:10px;height:10px;background:#7FB069;opacity:.4;border-radius:2px;margin-right:4px;vertical-align:middle"></span>Veg</span>
+      <span><span style="display:inline-block;width:10px;height:10px;background:#aaa;opacity:.5;border-radius:2px;margin-right:4px;vertical-align:middle"></span>Flower</span>
+      <span><span style="display:inline-block;width:10px;height:10px;background:#aaa;opacity:.9;border-radius:2px;margin-right:4px;vertical-align:middle"></span>Harvest</span>
+    </div>
+  </div>
+
+  <!-- Strain reference cards -->
+  <div class="strain-grid section-gap">
+    <template x-for="s in $store ? null : null" :key="s.id"><!-- loop below uses JS SEASON_DATA --></template>
+    <template x-for="s in [].concat(typeof SEASON_DATA !== 'undefined' ? SEASON_DATA.strains : [])" :key="s.id">
+      <div class="strain-card" :style="`border-left-color:${s.color}`">
+        <div class="strain-card-name" x-text="s.name"></div>
+        <div class="strain-stat">Type: <span x-text="s.type"></span></div>
+        <div class="strain-stat">Flower: <span x-text="s.flowerWeeks + 'w'"></span></div>
+        <div class="strain-stat" x-text="s.notes" style="margin-top:.4rem;font-size:.75rem;color:var(--muted);line-height:1.4"></div>
+      </div>
+    </template>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- Panel: Now                                       -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="panel-now" class="tab-panel" :class="{active:activeTab==='now'}">
+
+  <!-- Frost banner -->
+  <div class="frost-banner">
+    <div>
+      <div style="font-size:.75rem;color:var(--muted);margin-bottom:.1rem">First frost avg.</div>
+      <div style="font-weight:600" x-text="new Date(settings.firstFrostDate+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric'})"></div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:1.5rem;font-weight:700;color:var(--accent)" x-text="daysToFrost >= 0 ? daysToFrost + 'd away' : Math.abs(daysToFrost) + 'd ago'"></div>
+    </div>
+  </div>
+
+  <!-- Buddha frost risk warning -->
+  <div class="frost-warning" x-show="buddhaFrostRisk && !settings.lightDep">
+    Laughing Buddha harvest window overlaps first frost by 7 days or fewer. Consider enabling light dep mode in Settings to finish 2-3 weeks earlier.
+  </div>
+
+  <!-- Per-strain status cards -->
+  <div class="strain-grid">
+    <template x-for="info in strainStatuses" :key="info.strain.id">
+      <div class="strain-card" :style="`border-left-color:${info.strain.color}`">
+        <div class="strain-card-name" x-text="info.strain.name"></div>
+        <div style="margin-bottom:.5rem">
+          <span class="badge" :class="phaseBadgeClass(info.phase)" x-text="info.label"></span>
+        </div>
+        <div class="strain-stat" x-text="daysLabel(info)"></div>
+        <div class="strain-stat" x-show="info.phase !== 'done'" x-text="untilLabel(info)"></div>
+        <div class="strain-stat" x-show="info.phase !== 'done' && info.phase !== 'pre'">
+          Harvest: <span x-text="info.dates.harvestStart.toLocaleDateString('en-US',{month:'short',day:'numeric'})"></span>
+        </div>
+        <div x-show="info.strain.id === 'laughing-buddha' && settings.lightDep" style="margin-top:.4rem">
+          <span class="badge badge-pre">Light dep</span>
+        </div>
+      </div>
+    </template>
+  </div>
+
+  <!-- Season milestones -->
+  <div class="card">
+    <div class="card-title">Season milestones</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem">
+      <div class="strain-stat">Transplant target: <span>Jun 1</span></div>
+      <div class="strain-stat">Photoperiod flip: <span>Jul 25 &ndash; Aug 10</span></div>
+      <div class="strain-stat">First harvest check: <span>Sep 25</span></div>
+      <div class="strain-stat">Last harvest: <span x-text="settings.lightDep ? 'Oct 14 (light dep)' : 'Nov 8'"></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- Panel: Tasks                                     -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="panel-tasks" class="tab-panel" :class="{active:activeTab==='tasks'}">
+
+  <div class="filter-chips">
+    <button class="chip" :class="{active:taskFilter==='all'}"     @click="taskFilter='all'">All</button>
+    <button class="chip" :class="{active:taskFilter==='today'}"   @click="taskFilter='today'"
+      x-text="taskCounts.today ? 'Today (' + taskCounts.today + ')' : 'Today'"></button>
+    <button class="chip" :class="{active:taskFilter==='week'}"    @click="taskFilter='week'"
+      x-text="taskCounts.week ? 'This week (' + taskCounts.week + ')' : 'This week'"></button>
+    <button class="chip" :class="{active:taskFilter==='overdue'}" @click="taskFilter='overdue'"
+      x-text="taskCounts.overdue ? 'Overdue (' + taskCounts.overdue + ')' : 'Overdue'"></button>
+  </div>
+
+  <ul class="task-list">
+    <template x-for="task in filteredTasks" :key="task.instanceId">
+      <li class="task-item"
+          :class="{ overdue: isOverdue(task) && !taskChecked[task.instanceId], 'today-task': isToday(task) && !taskChecked[task.instanceId], done: taskChecked[task.instanceId] }"
+          @click="toggleTask(task.instanceId)">
+        <input type="checkbox" class="task-check" :checked="taskChecked[task.instanceId]" @click.stop="toggleTask(task.instanceId)">
+        <div class="task-body">
+          <div class="task-title" x-text="task.title"></div>
+          <div class="task-meta">
+            <span class="scope-dot" :style="`background:${strainColor(task.scope)}`"></span>
+            <span x-text="strainName(task.scope)"></span>
+            &mdash;
+            <span x-text="new Date(task.date + 'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})"></span>
+            <template x-if="isOverdue(task) && !taskChecked[task.instanceId]">
+              <span style="color:var(--danger);margin-left:.4rem">overdue</span>
+            </template>
+          </div>
+        </div>
+      </li>
+    </template>
+    <li x-show="filteredTasks.length === 0" class="empty-state">No tasks match this filter.</li>
+  </ul>
+</section>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- Panel: Journal                                   -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="panel-journal" class="tab-panel" :class="{active:activeTab==='journal'}">
+
+  <!-- Strain selector tabs -->
+  <div class="strain-tabs">
+    <template x-for="s in (typeof SEASON_DATA !== 'undefined' ? SEASON_DATA.strains : [])" :key="s.id">
+      <button class="strain-tab"
+              :class="{active: activeJournalStrain === s.id}"
+              :style="activeJournalStrain === s.id ? `background:${s.color};border-color:${s.color}` : ''"
+              @click="activeJournalStrain = s.id"
+              x-text="s.name"></button>
+    </template>
+  </div>
+
+  <!-- Entry form -->
+  <div class="card journal-form">
+    <div class="card-title" x-text="'New entry — ' + (activeStrainObj ? activeStrainObj.name : '')"></div>
+    <div class="form-row">
+      <div class="form-field">
+        <label>Date</label>
+        <input type="date" x-model="journalForm.date">
+      </div>
+      <div class="form-field">
+        <label>Height (in)</label>
+        <input type="number" min="0" step="0.5" x-model="journalForm.height" placeholder="0">
+      </div>
+      <div class="form-field">
+        <label>Nodes</label>
+        <input type="number" min="0" step="1" x-model="journalForm.nodes" placeholder="0">
+      </div>
+      <div class="form-field">
+        <label>Water (oz)</label>
+        <input type="number" min="0" step="1" x-model="journalForm.water" placeholder="0">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-field-wide" style="flex:1">
+        <label>Notes</label>
+        <textarea x-model="journalForm.text" placeholder="Observations, treatments, anything worth noting..." @keydown.ctrl.enter="addJournalEntry()"></textarea>
+      </div>
+    </div>
+    <div style="display:flex;gap:.5rem;justify-content:space-between;align-items:center;margin-top:.5rem">
+      <span style="font-size:.72rem;color:var(--muted)">Ctrl+Enter to save</span>
+      <button class="btn btn-primary" @click="addJournalEntry()">Add entry</button>
+    </div>
+  </div>
+
+  <!-- Export -->
+  <div style="margin-bottom:.75rem;display:flex;justify-content:flex-end">
+    <button class="btn" @click="exportJournal()">Export all as Markdown</button>
+  </div>
+
+  <!-- Entries list -->
+  <div>
+    <template x-for="entry in activeJournalEntries" :key="entry.id">
+      <div class="journal-entry">
+        <div class="journal-entry-date" x-text="new Date(entry.date + 'T00:00:00').toLocaleDateString('en-US',{weekday:'short',month:'long',day:'numeric',year:'numeric'})"></div>
+        <div class="journal-entry-text" x-text="entry.text"></div>
+        <div class="journal-entry-stats" x-show="entry.height || entry.nodes || entry.water">
+          <span class="journal-entry-stat" x-show="entry.height">Height: <span x-text="entry.height + ' in'"></span></span>
+          <span class="journal-entry-stat" x-show="entry.nodes">Nodes: <span x-text="entry.nodes"></span></span>
+          <span class="journal-entry-stat" x-show="entry.water">Water: <span x-text="entry.water + ' oz'"></span></span>
+        </div>
+        <div style="margin-top:.5rem">
+          <button class="btn btn-danger" style="font-size:.72rem;padding:.2rem .55rem" @click.stop="deleteJournalEntry(entry.id)">Delete</button>
+        </div>
+      </div>
+    </template>
+    <div class="empty-state" x-show="activeJournalEntries.length === 0">
+      No entries yet for this strain. Add your first observation above.
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- Panel: Shopping                                  -->
+<!-- ═══════════════════════════════════════════════ -->
+<section id="panel-shopping" class="tab-panel" :class="{active:activeTab==='shopping'}">
+
+  <!-- Summary -->
+  <div class="shop-summary">
+    <span x-text="shopProgress.acquired + ' of ' + shopProgress.total + ' items acquired'"></span>
+    <div class="progress-bar">
+      <div class="progress-fill" :style="`width:${shopProgress.pct}%`"></div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-chips" style="margin-bottom:1rem">
+    <button class="chip" :class="{active:shopFilter==='all'}"      @click="shopFilter='all'">All</button>
+    <button class="chip" :class="{active:shopFilter==='now'}"      @click="shopFilter='now'">Need now</button>
+    <button class="chip" :class="{active:shopFilter==='needed'}"   @click="shopFilter='needed'">All needed</button>
+    <button class="chip" :class="{active:shopFilter==='acquired'}" @click="shopFilter='acquired'">Acquired</button>
+  </div>
+
+  <!-- Category groups -->
+  <template x-for="cat in shopCategoryNames" :key="cat">
+    <div class="shop-category" x-show="catHasItems(cat) || shopFilter === 'all'">
+      <div class="shop-cat-header" @click="toggleCat(cat)">
+        <span x-text="categoryLabel(cat)"></span>
+        <span class="shop-cat-count" x-text="catProgress(cat) + ' acquired  ' + (shopCollapsed[cat] ? '▸' : '▾')"></span>
+      </div>
+      <div class="shop-items" x-show="!shopCollapsed[cat]">
+        <template x-for="item in filteredShopItems(cat)" :key="item.id">
+          <div class="shop-item" :class="{acquired: getShopStatus(item.id)==='acquired'}" @click="cycleShopStatus(item.id)">
+            <div class="priority-dot" :class="'p-' + item.priority" :title="item.priority"></div>
+            <div class="shop-item-body">
+              <div class="shop-item-name" x-text="item.name"></div>
+              <div class="shop-item-meta">
+                <span x-text="item.quantity"></span>
+                &mdash; need by <span x-text="new Date(item.needBy + 'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})"></span>
+              </div>
+              <div class="shop-item-notes" x-show="item.notes" x-text="item.notes"></div>
+            </div>
+            <span class="shop-status" :class="'status-' + getShopStatus(item.id)" x-text="getShopStatus(item.id)"></span>
+          </div>
+        </template>
+        <div class="empty-state" x-show="filteredShopItems(cat).length === 0" style="padding:.75rem">
+          No items match this filter.
+        </div>
+      </div>
+    </div>
+  </template>
+</section>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- Settings modal                                   -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="modal-backdrop" x-show="showSettings" @click.self="showSettings=false" style="display:none">
+  <div class="modal" @click.stop>
+    <div class="modal-title">Settings</div>
+    <button class="modal-close" @click="showSettings=false" aria-label="Close">&times;</button>
+
+    <!-- Light dep toggle -->
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">Laughing Buddha light dep</div>
+        <div class="setting-desc">Shifts flower start to Jul 15 and harvest to Oct 7&ndash;14</div>
+      </div>
+      <label class="toggle" title="Toggle light dep mode">
+        <input type="checkbox" :checked="settings.lightDep" @change="toggleLightDep()">
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+      </label>
+    </div>
+
+    <!-- Transplant date -->
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">Transplant date</div>
+      </div>
+      <input class="setting-input" type="date" x-model="editTransplant" @change="applySettings()">
+    </div>
+
+    <!-- First frost date -->
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">First frost (avg)</div>
+      </div>
+      <input class="setting-input" type="date" x-model="editFrost" @change="applySettings()">
+    </div>
+
+    <div class="setting-row">
+      <button class="btn btn-danger" @click="resetDates()" style="font-size:.8rem">Reset dates to defaults</button>
+    </div>
+
+    <!-- Export / Import -->
+    <div style="border-top:1px solid var(--border);padding-top:1rem;margin-top:.5rem">
+      <div class="card-title">Data</div>
+      <div class="modal-actions">
+        <button class="btn" @click="exportState()">Export state</button>
+        <button class="btn" @click="importState()">Import state</button>
+        <button class="btn" @click="exportJournal()">Export journal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

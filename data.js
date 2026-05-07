@@ -1,0 +1,112 @@
+window.SEASON_DATA = {
+  season: {
+    year: 2026,
+    location: "Roanoke, VA 24016",
+    latitude: 37.27,
+    zone: "7a",
+    transplantTarget: "2026-06-01",
+    firstFrostAvg: "2026-10-21",
+    photoperiodFlipWindow: "2026-07-25 to 2026-08-10",
+    potModel: "VIVOSUN 25 Gallon Heavy Duty Nonwoven Fabric with Handles",
+    potCount: 5
+  },
+  strains: [
+    {
+      id: "sour-strawberry",
+      name: "Sour Strawberry",
+      type: "Hybrid",
+      flowerWeeks: 9,
+      potSizeGal: 25,
+      vegStart: "2026-05-22",
+      flowerStart: "2026-07-28",
+      harvestStart: "2026-09-29",
+      harvestEnd: "2026-10-05",
+      color: "#7FB069",
+      notes: "Easiest of the four. Manageable size, fruity diesel profile, fairly forgiving."
+    },
+    {
+      id: "apple-fritter",
+      name: "Apple Fritter",
+      type: "Balanced hybrid",
+      flowerWeeks: 8.5,
+      potSizeGal: 25,
+      vegStart: "2026-05-22",
+      flowerStart: "2026-07-28",
+      harvestStart: "2026-09-25",
+      harvestEnd: "2026-10-01",
+      color: "#E07A5F",
+      notes: "Dense colas prone to bud rot in humid late-summer finish. Aggressive defoliation in late flower, prioritize airflow placement."
+    },
+    {
+      id: "blue-dream",
+      name: "Blue Dream",
+      type: "Sativa-leaning hybrid",
+      flowerWeeks: 9.5,
+      potSizeGal: 25,
+      vegStart: "2026-05-22",
+      flowerStart: "2026-08-01",
+      harvestStart: "2026-10-08",
+      harvestEnd: "2026-10-15",
+      color: "#5B8DD9",
+      notes: "Vigorous, 2-3x stretch, heavy yielder. Top early in week 4-5 of veg to control height. Wants the bigger pot."
+    },
+    {
+      id: "laughing-buddha",
+      name: "Laughing Buddha",
+      type: "Pure sativa",
+      flowerWeeks: 12,
+      potSizeGal: 25,
+      vegStart: "2026-05-22",
+      flowerStart: "2026-08-08",
+      harvestStart: "2026-10-30",
+      harvestEnd: "2026-11-08",
+      color: "#C9A227",
+      notes: "Long-flowering pure sativa. Default schedule finishes past first frost. Enable light dep mode (cover daily 8pm-8am from 2026-07-10) to flip three weeks early and harvest mid-October instead.",
+      lightDepMode: {
+        enabled: false,
+        coverStart: "2026-07-10",
+        flowerStart: "2026-07-15",
+        harvestStart: "2026-10-07",
+        harvestEnd: "2026-10-14"
+      }
+    }
+  ],
+  tasks: [
+    { id: "transplant", date: "2026-06-01", title: "Transplant to final pots", scope: "all" },
+    { id: "top-bd", date: "2026-06-15", title: "Top Blue Dream (control height)", scope: "blue-dream" },
+    { id: "top-lb", date: "2026-06-15", title: "Top Laughing Buddha (control height)", scope: "laughing-buddha" },
+    { id: "lst-1", date: "2026-06-22", title: "First LST pass on all four", scope: "all" },
+    { id: "ldep-start", date: "2026-07-10", title: "Begin Buddha light dep covers (if light dep mode enabled)", scope: "laughing-buddha", conditional: "lightDep" },
+    { id: "bt-1", date: "2026-07-25", title: "First Bt spray (caterpillars)", scope: "all", recurring: "weekly", until: "2026-10-15" },
+    { id: "defoliate-af", date: "2026-08-15", title: "Defoliate Apple Fritter mid-flower (airflow)", scope: "apple-fritter" },
+    { id: "harvest-af", date: "2026-09-25", title: "Begin checking Apple Fritter trichomes daily", scope: "apple-fritter" },
+    { id: "harvest-ss", date: "2026-09-29", title: "Begin checking Sour Strawberry trichomes daily", scope: "sour-strawberry" },
+    { id: "harvest-bd", date: "2026-10-08", title: "Begin checking Blue Dream trichomes daily", scope: "blue-dream" },
+    { id: "frost-watch", date: "2026-10-15", title: "Frost watch begins, plan Buddha indoor finish if needed", scope: "laughing-buddha" },
+    { id: "harvest-lb", date: "2026-10-30", title: "Begin checking Buddha trichomes daily (later if light dep)", scope: "laughing-buddha" }
+  ],
+  shopping: [
+    { id: "soil-base", category: "soil", name: "Bagged organic soil (Roots Organic Original primary, FoxFarm Ocean Forest acceptable substitute)", quantity: "8-10 bags @ 1.5 cu ft", needBy: "2026-05-15", priority: "critical", notes: "25 gal pot holds ~3.3 cu ft, need ~2.2 bags per pot. ~$200 for Roots Organic vs ~$300 for Coast of Maine Stonington Blend." },
+    { id: "worm-castings", category: "soil", name: "Worm castings", quantity: "1x 30-40 lb bag", needBy: "2026-05-15", priority: "high", notes: "Top dress at flip and once mid-flower." },
+    { id: "amendment", category: "soil", name: "Dry organic amendment (Down to Earth All-Purpose 4-6-2 or BuildASoil Craft Blend)", quantity: "1x 5 lb", needBy: "2026-07-01", priority: "medium", notes: "Top dress at flip and again 4 weeks into flower." },
+    { id: "calmag", category: "soil", name: "Cal-Mag supplement (organic, like Earth Juice or Botanicare)", quantity: "1x 32 oz", needBy: "2026-06-15", priority: "medium", notes: "Standby for late-veg deficiency signs." },
+    { id: "dollies", category: "mobility", name: "Heavy-duty plant dollies with locking casters (300+ lb rated)", quantity: "4", needBy: "2026-05-15", priority: "critical", notes: "Or build from 2x4s and 3-inch casters. Saturated 25-gal pot is 150-180 lbs." },
+    { id: "bt", category: "pests", name: "Bt spray (Monterey BT or Safer Caterpillar Killer)", quantity: "1x 32 oz concentrate", needBy: "2026-07-15", priority: "critical", notes: "Weekly sprays late July through harvest. Caterpillars are the central VA enemy." },
+    { id: "neem", category: "pests", name: "Cold-pressed neem oil + emulsifier", quantity: "1x 16 oz", needBy: "2026-06-01", priority: "high", notes: "Preventative weekly through veg. Stop two weeks before flower." },
+    { id: "spinosad", category: "pests", name: "Spinosad (Captain Jack's Deadbug Brew)", quantity: "1x 32 oz concentrate", needBy: "2026-06-15", priority: "medium", notes: "Backup for thrips and Bt-resistant caterpillars." },
+    { id: "ph-kit", category: "pests", name: "pH test kit or pen meter", quantity: "1", needBy: "2026-05-15", priority: "medium", notes: "Spot check runoff if plants look off." },
+    { id: "shears", category: "tools", name: "Pruning shears (Felco F-2 or Fiskars)", quantity: "1 pair", needBy: "2026-06-01", priority: "high" },
+    { id: "stakes", category: "tools", name: "Bamboo stakes 4-6 ft", quantity: "12", needBy: "2026-07-01", priority: "medium", notes: "Buddha and Blue Dream will need support in flower." },
+    { id: "ties", category: "tools", name: "Soft plant ties (Velcro or rubber-coated wire)", quantity: "1 roll", needBy: "2026-06-15", priority: "medium" },
+    { id: "trellis", category: "tools", name: "Trellis netting 5x15 ft", quantity: "1", needBy: "2026-07-15", priority: "low", notes: "Only if going scrog. Skip otherwise." },
+    { id: "sprayer", category: "tools", name: "1-gallon pump sprayer", quantity: "1", needBy: "2026-06-01", priority: "high", notes: "For Bt and neem applications." },
+    { id: "loupe", category: "tools", name: "Jeweler's loupe 60-100x or USB microscope", quantity: "1", needBy: "2026-09-15", priority: "high", notes: "Trichome inspection for harvest timing." },
+    { id: "blackout-cover", category: "lightdep", name: "Blackout cover material (5-mil black plastic, blackout cloth, or large opaque tote)", quantity: "enough for 1 plant", needBy: "2026-07-05", priority: "conditional", notes: "Only if running light dep on Buddha." },
+    { id: "blackout-frame", category: "lightdep", name: "PVC frame parts or rigid tote for daily covering", quantity: "1 setup", needBy: "2026-07-05", priority: "conditional" },
+    { id: "drying-rack", category: "drying", name: "Mesh drying rack 3-tier", quantity: "1", needBy: "2026-09-15", priority: "high" },
+    { id: "jars", category: "drying", name: "Quart mason jars", quantity: "16-24", needBy: "2026-09-25", priority: "high", notes: "Quantity scales with yield. Have 16 minimum, more for Blue Dream and Buddha." },
+    { id: "boveda", category: "drying", name: "Boveda 62% humidity packs (size 67)", quantity: "16-24", needBy: "2026-09-25", priority: "high", notes: "One per quart jar." },
+    { id: "hygrometer", category: "drying", name: "Mini hygrometer for cure jars", quantity: "2", needBy: "2026-09-25", priority: "medium", notes: "Rotate between jars during first two weeks of cure." },
+    { id: "screening", category: "privacy", name: "Bamboo or reed fence panel for porch railing", quantity: "as needed", needBy: "2026-05-15", priority: "high", notes: "VA requires plants not visible from public view." }
+  ]
+};
