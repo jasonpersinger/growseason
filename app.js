@@ -314,11 +314,29 @@ document.addEventListener('alpine:init', () => {
       return cats;
     },
     get shopCategoryNames() {
-      return Object.keys(this.shopCategories);
+      const order = ['soil', 'nutrients', 'mobility', 'pests', 'tools', 'lightdep', 'drying', 'privacy'];
+      const names = Object.keys(this.shopCategories);
+      return [
+        ...order.filter(cat => names.includes(cat)),
+        ...names.filter(cat => !order.includes(cat)).sort(),
+      ];
     },
     categoryLabel(cat) {
-      const labels = { soil: 'Soil', mobility: 'Mobility', pests: 'Pest Control', tools: 'Tools', lightdep: 'Light Dep', drying: 'Drying & Cure', privacy: 'Privacy' };
+      const labels = { soil: 'Soil', nutrients: 'Nutrients', mobility: 'Mobility', pests: 'Pest Control', tools: 'Tools', lightdep: 'Light Dep', drying: 'Drying & Cure', privacy: 'Privacy' };
       return labels[cat] || cat;
+    },
+    categoryColor(cat) {
+      const colors = {
+        soil: '#7FB069',
+        nutrients: '#56B6A5',
+        mobility: '#8b949e',
+        pests: '#E07A5F',
+        tools: '#C9A227',
+        lightdep: '#58a6ff',
+        drying: '#B088D8',
+        privacy: '#A0A8B7',
+      };
+      return colors[cat] || this.strainColor(cat);
     },
     filteredShopItems(cat) {
       const items = this.shopCategories[cat] || [];

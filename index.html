@@ -257,8 +257,8 @@
   <!-- Category groups -->
   <template x-for="cat in shopCategoryNames" :key="cat">
     <div class="shop-category" x-show="catHasItems(cat) || shopFilter === 'all'">
-      <div class="shop-cat-header" @click="toggleCat(cat)">
-        <span x-text="categoryLabel(cat)"></span>
+      <div class="shop-cat-header" :style="`--cat-color:${categoryColor(cat)}`" @click="toggleCat(cat)">
+        <span class="shop-cat-name" x-text="categoryLabel(cat)"></span>
         <span class="shop-cat-count" x-text="catProgress(cat) + ' acquired  ' + (shopCollapsed[cat] ? '▸' : '▾')"></span>
       </div>
       <div class="shop-items" x-show="!shopCollapsed[cat]">

@@ -385,13 +385,27 @@ input, textarea, select { font: inherit; }
   padding: .5rem .75rem;
   background: var(--surface2);
   border: 1px solid var(--border);
+  border-left: 3px solid var(--cat-color, var(--accent));
   border-radius: 6px;
   cursor: pointer;
   font-size: .85rem;
   font-weight: 600;
   user-select: none;
 }
-.shop-cat-header:hover { border-color: var(--accent); }
+.shop-cat-header:hover { border-color: var(--cat-color, var(--accent)); }
+.shop-cat-name {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+}
+.shop-cat-name::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cat-color, var(--accent));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cat-color, var(--accent)) 18%, transparent);
+}
 .shop-cat-count { font-size: .75rem; color: var(--muted); font-weight: 400; }
 .shop-items { border: 1px solid var(--border); border-top: none; border-radius: 0 0 6px 6px; }
 .shop-item {
