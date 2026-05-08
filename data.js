@@ -87,7 +87,7 @@ window.SEASON_DATA = {
   ],
   shopping: [
     { id: "soil-base", category: "soil", name: "Pro-Mix BX Mycorrhizae 3.8 cu ft compressed bale", quantity: "2 bales", needBy: "2026-05-15", priority: "critical", notes: "Each bale expands to ~8 cu ft loose. Two bales fills all four 25-gal pots with a small margin. Pre-inoculated with mycorrhizae, peat-based with perlite and vermiculite, lime-buffered. Container-safe, requires nutrient feeding." },
-    { id: "worm-castings", category: "soil", name: "Worm castings", quantity: "1x 30-40 lb bag", needBy: "2026-05-15", priority: "high", notes: "Top dress at flip and once mid-flower." },
+    { id: "worm-castings", category: "soil", name: "Worm castings", quantity: "1x 8-15 lb bag (~9-16 quarts)", needBy: "2026-05-15", priority: "high", notes: "Topdress 1-2 cups per pot at transplant and again at flip. Total season use ~4-8 lbs, single small bag is plenty." },
     { id: "perlite-extra", category: "soil", name: "Perlite (coarse grade)", quantity: "1x 2 cu ft bag", needBy: "2026-05-15", priority: "low", notes: "Optional. Pro-Mix BX has perlite already; only add if drainage feels heavy in the bottom third of pots." },
     { id: "amendment", category: "soil", name: "Dry organic amendment (Down to Earth All-Purpose 4-6-2 or BuildASoil Craft Blend)", quantity: "1x 5 lb", needBy: "2026-07-01", priority: "medium", notes: "Top dress at flip and again 4 weeks into flower. Less critical with active liquid feeding but still useful for slow-release backup." },
     { id: "calmag", category: "soil", name: "Cal-Mag supplement (organic, like Earth Juice or Botanicare)", quantity: "1x 32 oz", needBy: "2026-06-15", priority: "high", notes: "Standby for late-veg deficiency signs." },
