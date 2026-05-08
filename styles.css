@@ -419,6 +419,11 @@ input, textarea, select { font: inherit; }
 }
 .shop-item:last-child { border-bottom: none; }
 .shop-item:hover { background: var(--surface2); }
+.shop-item.overdue {
+  background: #1a0a0a;
+  border-left: 2px solid var(--danger);
+}
+.shop-item.overdue:hover { background: #221010; }
 .shop-item.acquired { opacity: .5; }
 .priority-dot {
   width: 8px; height: 8px;
@@ -434,6 +439,11 @@ input, textarea, select { font: inherit; }
 .shop-item-body { flex: 1; min-width: 0; }
 .shop-item-name { font-size: .85rem; line-height: 1.4; }
 .shop-item-meta { font-size: .75rem; color: var(--muted); margin-top: .15rem; }
+.shop-overdue {
+  color: var(--danger);
+  font-weight: 600;
+  margin-left: .4rem;
+}
 .shop-item-notes {
   font-size: .75rem;
   color: var(--muted);

@@ -54,20 +54,29 @@ function strainPhase(strain, today, lightDepOn) {
 }
 
 /* ── Task expansion ─────────────────────────────── */
-function expandTasks(lightDepOn) {
+function taskForSettings(task, settings) {
+  const next = { ...task };
+  if (next.id === 'transplant') next.date = settings.transplantDate;
+  if (settings.lightDep && next.lightDep) Object.assign(next, next.lightDep);
+  delete next.lightDep;
+  return next;
+}
+
+function expandTasks(settings) {
   const tasks = [];
   for (const t of SEASON_DATA.tasks) {
-    if (t.conditional === 'lightDep' && !lightDepOn) continue;
-    if (!t.recurring) {
-      tasks.push({ ...t, instanceId: t.id });
+    if (t.conditional === 'lightDep' && !settings.lightDep) continue;
+    const task = taskForSettings(t, settings);
+    if (!task.recurring) {
+      tasks.push({ ...task, instanceId: task.id });
       continue;
     }
-    const start = parseDate(t.date);
-    const end = parseDate(t.until);
+    const start = parseDate(task.date);
+    const end = parseDate(task.until);
     let cur = new Date(start);
     let i = 0;
     while (cur <= end) {
-      tasks.push({ ...t, date: isoDate(cur), instanceId: `${t.id}-${i}` });
+      tasks.push({ ...task, date: isoDate(cur), instanceId: `${task.id}-${i}` });
       cur = addDays(cur, 7);
       i++;
     }
@@ -111,8 +120,8 @@ document.addEventListener('alpine:init', () => {
 
     settings: {
       lightDep: false,
-      transplantDate: '2026-06-01',
-      firstFrostDate: '2026-10-21',
+      transplantDate: SEASON_DATA.season.transplantTarget,
+      firstFrostDate: SEASON_DATA.season.firstFrostAvg,
     },
 
     taskChecked: {},
@@ -163,10 +172,10 @@ document.addEventListener('alpine:init', () => {
       this.saveSettings();
     },
     resetDates() {
-      this.editTransplant = '2026-06-01';
-      this.editFrost = '2026-10-21';
-      this.settings.transplantDate = '2026-06-01';
-      this.settings.firstFrostDate = '2026-10-21';
+      this.editTransplant = SEASON_DATA.season.transplantTarget;
+      this.editFrost = SEASON_DATA.season.firstFrostAvg;
+      this.settings.transplantDate = SEASON_DATA.season.transplantTarget;
+      this.settings.firstFrostDate = SEASON_DATA.season.firstFrostAvg;
       this.saveSettings();
     },
     toggleLightDep() {
@@ -207,7 +216,7 @@ document.addEventListener('alpine:init', () => {
     },
 
     // ── Tasks ───────────────────────────────────────
-    get expandedTasks() { return expandTasks(this.settings.lightDep); },
+    get expandedTasks() { return expandTasks(this.settings); },
 
     get filteredTasks() {
       const tasks = this.expandedTasks;
@@ -249,6 +258,10 @@ document.addEventListener('alpine:init', () => {
         overdue: tasks.filter(t => t.date < today && !this.taskChecked[t.instanceId]).length,
         week: tasks.filter(t => t.date >= today && t.date <= isoDate(addDays(this.today, 6))).length,
       };
+    },
+
+    formatDate(dateStr, options = { month: 'short', day: 'numeric' }) {
+      return parseDate(dateStr).toLocaleDateString('en-US', options);
     },
 
     // ── Journal ─────────────────────────────────────
@@ -341,14 +354,16 @@ document.addEventListener('alpine:init', () => {
     filteredShopItems(cat) {
       const items = this.shopCategories[cat] || [];
       const needBy14 = isoDate(addDays(this.today, 14));
-      const today = isoDate(this.today);
       return items.filter(item => {
         const status = this.shopStatus[item.id] || 'needed';
-        if (this.shopFilter === 'now') return status === 'needed' && item.needBy <= needBy14 && item.needBy >= today;
+        if (this.shopFilter === 'now') return status === 'needed' && item.needBy <= needBy14;
         if (this.shopFilter === 'needed') return status === 'needed';
         if (this.shopFilter === 'acquired') return status === 'acquired';
         return true;
       }).sort((a, b) => a.needBy.localeCompare(b.needBy));
+    },
+    isShopOverdue(item) {
+      return (this.shopStatus[item.id] || 'needed') === 'needed' && item.needBy < isoDate(this.today);
     },
     catHasItems(cat) {
       return this.filteredShopItems(cat).length > 0;

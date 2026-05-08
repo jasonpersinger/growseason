@@ -1,7 +1,7 @@
 window.SEASON_DATA = {
   season: {
     year: 2026,
-    location: "Roanoke, VA 24016",
+    location: "Roanoke, VA area",
     latitude: 37.27,
     zone: "7a",
     transplantTarget: "2026-06-01",
@@ -82,8 +82,8 @@ window.SEASON_DATA = {
     { id: "harvest-af", date: "2026-09-25", title: "Begin checking Apple Fritter trichomes daily", scope: "apple-fritter" },
     { id: "harvest-ss", date: "2026-09-29", title: "Begin checking Sour Strawberry trichomes daily", scope: "sour-strawberry" },
     { id: "harvest-bd", date: "2026-10-08", title: "Begin checking Blue Dream trichomes daily", scope: "blue-dream" },
-    { id: "frost-watch", date: "2026-10-15", title: "Frost watch begins, plan Buddha indoor finish if needed", scope: "laughing-buddha" },
-    { id: "harvest-lb", date: "2026-10-30", title: "Begin checking Buddha trichomes daily (later if light dep)", scope: "laughing-buddha" }
+    { id: "frost-watch", date: "2026-10-15", title: "Frost watch begins, plan Buddha indoor finish if needed", scope: "laughing-buddha", lightDep: { date: "2026-10-01", title: "Weather watch begins for Buddha light dep finish" } },
+    { id: "harvest-lb", date: "2026-10-30", title: "Begin checking Buddha trichomes daily", scope: "laughing-buddha", lightDep: { date: "2026-10-07", title: "Begin checking Buddha trichomes daily (light dep)" } }
   ],
   shopping: [
     { id: "soil-base", category: "soil", name: "Pro-Mix BX Mycorrhizae 3.8 cu ft compressed bale", quantity: "2 bales", needBy: "2026-05-15", priority: "critical", notes: "Each bale expands to ~8 cu ft loose. Two bales fills all four 25-gal pots with a small margin. Pre-inoculated with mycorrhizae, peat-based with perlite and vermiculite, lime-buffered. Container-safe, requires nutrient feeding." },

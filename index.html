@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
   <title>GrowSeason 2026</title>
   <link rel="stylesheet" href="styles.css">
   <script src="data.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.15.12/dist/cdn.min.js"></script>
   <script src="app.js"></script>
 </head>
 <body x-data="app" x-init="init()">
@@ -33,7 +34,7 @@
 <!-- Panel: Timeline                                  -->
 <!-- ═══════════════════════════════════════════════ -->
 <section id="panel-timeline" class="tab-panel" :class="{active:activeTab==='timeline'}">
-  <div class="card-title" style="margin-bottom:.5rem">Season at a glance &mdash; Roanoke, VA 2026</div>
+  <div class="card-title" style="margin-bottom:.5rem">Season at a glance &mdash; Roanoke, VA area 2026</div>
 
   <!-- Desktop SVG timeline -->
   <div id="timeline-wrap">
@@ -53,7 +54,6 @@
 
   <!-- Strain reference cards -->
   <div class="strain-grid section-gap">
-    <template x-for="s in $store ? null : null" :key="s.id"><!-- loop below uses JS SEASON_DATA --></template>
     <template x-for="s in [].concat(typeof SEASON_DATA !== 'undefined' ? SEASON_DATA.strains : [])" :key="s.id">
       <div class="strain-card" :style="`border-left-color:${s.color}`">
         <div class="strain-card-name" x-text="s.name"></div>
@@ -110,7 +110,7 @@
   <div class="card">
     <div class="card-title">Season milestones</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem">
-      <div class="strain-stat">Transplant target: <span>Jun 1</span></div>
+      <div class="strain-stat">Transplant target: <span x-text="formatDate(settings.transplantDate, { month:'short', day:'numeric' })"></span></div>
       <div class="strain-stat">Photoperiod flip: <span>Jul 25 &ndash; Aug 10</span></div>
       <div class="strain-stat">First harvest check: <span>Sep 25</span></div>
       <div class="strain-stat">Last harvest: <span x-text="settings.lightDep ? 'Oct 14 (light dep)' : 'Nov 8'"></span></div>
@@ -263,13 +263,16 @@
       </div>
       <div class="shop-items" x-show="!shopCollapsed[cat]">
         <template x-for="item in filteredShopItems(cat)" :key="item.id">
-          <div class="shop-item" :class="{acquired: getShopStatus(item.id)==='acquired'}" @click="cycleShopStatus(item.id)">
+          <div class="shop-item" :class="{acquired: getShopStatus(item.id)==='acquired', overdue: isShopOverdue(item)}" @click="cycleShopStatus(item.id)">
             <div class="priority-dot" :class="'p-' + item.priority" :title="item.priority"></div>
             <div class="shop-item-body">
               <div class="shop-item-name" x-text="item.name"></div>
               <div class="shop-item-meta">
                 <span x-text="item.quantity"></span>
                 &mdash; need by <span x-text="new Date(item.needBy + 'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})"></span>
+                <template x-if="isShopOverdue(item)">
+                  <span class="shop-overdue">overdue</span>
+                </template>
               </div>
               <div class="shop-item-notes" x-show="item.notes" x-text="item.notes"></div>
             </div>

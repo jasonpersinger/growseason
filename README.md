@@ -1,6 +1,6 @@
 # GrowSeason 2026
 
-A single-page dashboard for tracking an outdoor cannabis grow in Roanoke, VA.
+A single-page dashboard for tracking an outdoor cannabis grow in the Roanoke, VA area.
 
 ## Run locally
 
@@ -9,6 +9,14 @@ python -m http.server
 ```
 
 Then open `http://localhost:8000`.
+
+## Validate
+
+```sh
+npm test
+```
+
+The validation script checks duplicate IDs, date formats, known shopping categories, light-dep task overrides, and a few UI wiring assumptions.
 
 ## Deploy to Netlify
 
@@ -29,7 +37,7 @@ All reference data lives in `data.js` as `window.SEASON_DATA`. The object has fo
 
 - `season` — location, zone, frost date, transplant target
 - `strains[]` — per-strain phenology dates, color, and notes. Laughing Buddha has a nested `lightDepMode` object with alternate dates.
-- `tasks[]` — task definitions. `recurring: "weekly"` with `until` expands to individual dated entries. `conditional: "lightDep"` hides the task unless light dep is enabled.
+- `tasks[]` — task definitions. `recurring: "weekly"` with `until` expands to individual dated entries. `conditional: "lightDep"` hides the task unless light dep is enabled. `lightDep` task overrides can replace date/title when light dep mode is on.
 - `shopping[]` — supply items with `priority`, `needBy`, and optional `notes`.
 
 All user state (task completion, journal entries, shopping status, settings) is persisted to `localStorage` and survives hard reloads.
@@ -60,6 +68,8 @@ growseason/
   app.js         — Alpine.js component, all logic
   data.js        — SEASON_DATA reference data
   styles.css     — dark theme, mobile-first
+  package.json   — validation script entrypoint
+  scripts/       — dependency-free project checks
   netlify.toml   — static deploy config
   README.md      — this file
 ```
